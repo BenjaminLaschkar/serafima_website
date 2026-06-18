@@ -1,0 +1,47 @@
+services:
+  web:
+    build:
+      context: .
+      dockerfile: Dockerfile
+    image: serafima-liberman:latest
+    container_name: serafima-web
+    restart: unless-stopped
+    environment:
+      - NODE_ENV=production
+      - NEXT_PUBLIC_SITE_URL=${NEXT_PUBLIC_SITE_URL:-https://www.serafima-liberman.com}
+      - NEXT_PUBLIC_PLAUSIBLE_DOMAIN=${NEXT_PUBLIC_PLAUSIBLE_DOMAIN:-serafima-liberman.com}
+      - RESEND_API_KEY=${RESEND_API_KEY}
+      - CONTACT_TO_EMAIL=${CONTACT_TO_EMAIL:-serafimaliberman@gmail.com}
+      - CONTACT_FROM_EMAIL=${CONTACT_FROM_EMAIL:-contact@serafima-liberman.com}
+    ports:
+      - "127.0.0.1:3000:3000"
+    networks:
+      - web
+    healthcheck:
+      test: ["CMD", "wget", "--quiet", "--spider", "http://127.0.0.1:3000/"]
+      interval: 30s
+      timeout: 5s
+      retries: 3
+
+  nginx:
+    image: nginx:1.27-alpine
+    container_name: serafima-nginx
+    restart: unless-stopped
+    depends_on:
+      - web
+    ports:
+      - "80:80"
+      - "443:443"
+    volumes:
+      - ./nginx/serafima.conf:/etc/nginx/conf.d/default.conf:ro
+      - /etc/letsencrypt:/etc/letsencrypt:ro
+      - nginx-cache:/var/cache/nginx
+    networks:
+      - web
+
+networks:
+  web:
+    driver: bridge
+
+volumes:
+  nginx-cache:
