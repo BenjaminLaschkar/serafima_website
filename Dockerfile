@@ -5,9 +5,7 @@ FROM node:22-alpine AS deps
 RUN apk add --no-cache libc6-compat
 WORKDIR /app
 COPY package.json package-lock.json* ./
-RUN \
-  if [ -f package-lock.json ]; then npm ci; \
-  else npm install --no-audit --no-fund; fi
+RUN npm install --no-audit --no-fund
 
 # ---------- 2. Builder ----------
 FROM node:22-alpine AS builder
