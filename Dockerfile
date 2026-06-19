@@ -6,6 +6,7 @@ RUN apk add --no-cache libc6-compat
 WORKDIR /app
 COPY package.json package-lock.json* ./
 RUN npm install --no-audit --no-fund
+RUN npm install sharp --no-audit --no-fund
 
 # ---------- 2. Builder ----------
 FROM node:22-alpine AS builder
