@@ -3,6 +3,8 @@ import { Hero } from "@/components/Hero";
 import { HomeContent } from "@/components/HomeContent";
 import { events as staticEvents } from "@/data/schedule";
 import { fetchCalendarEvents } from "@/lib/googleCalendar";
+
+export const dynamic = "force-dynamic";
 import { site } from "@/data/site";
 
 export const metadata: Metadata = {

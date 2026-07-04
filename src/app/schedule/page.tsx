@@ -5,6 +5,8 @@ import { events as staticEvents } from "@/data/schedule";
 import { site } from "@/data/site";
 import { fetchCalendarEvents } from "@/lib/googleCalendar";
 
+export const dynamic = "force-dynamic";
+
 export const metadata: Metadata = {
   title: "Agenda",
   description: "Prochaines représentations, récitals et concerts de Serafima Liberman.",
