@@ -39,7 +39,8 @@ export function ContactForm() {
     }
     setStatus("loading");
     setCaptchaError(false);
-    const formData = new FormData(e.currentTarget);
+    const form = e.currentTarget;
+    const formData = new FormData(form);
     const payload = Object.fromEntries(formData.entries());
     try {
       const res = await fetch("/api/contact", {
@@ -53,7 +54,7 @@ export function ContactForm() {
       }
       setStatus("success");
       setMessage(t.successMsg);
-      e.currentTarget.reset();
+      form.reset();
       refreshCaptcha();
     } catch (err) {
       setStatus("error");

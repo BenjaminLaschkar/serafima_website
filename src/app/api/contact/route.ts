@@ -26,7 +26,7 @@ export async function POST(req: Request) {
     }
 
     const resend = new Resend(apiKey);
-    await resend.emails.send({
+    const { data: sent, error: sendError } = await resend.emails.send({
       from: `Serafima Liberman — Site <${from}>`,
       to: [to],
       replyTo: data.email,
@@ -34,6 +34,12 @@ export async function POST(req: Request) {
       text: `De : ${data.name} <${data.email}>\n\n${data.message}`,
     });
 
+    if (sendError) {
+      console.error("[contact] Resend error:", sendError);
+      return NextResponse.json({ ok: false, error: sendError.message }, { status: 400 });
+    }
+
+    console.log("[contact] Email sent:", sent?.id);
     return NextResponse.json({ ok: true });
   } catch (err) {
     const msg = err instanceof Error ? err.message : "Erreur inconnue";
