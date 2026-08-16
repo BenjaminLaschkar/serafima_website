@@ -12,8 +12,15 @@ type Props = PropsWithChildren<{
 
 export function Reveal({ children, delay = 0, y = 28, className, once = true }: Props) {
   const reduce = useReducedMotion();
+
+  // Avec prefers-reduced-motion, on affiche le contenu directement sans animation.
+  // C'est meilleur pour l'accessibilité ET pour les tests Playwright (reducedMotion: 'reduce').
+  if (reduce) {
+    return <div className={className}>{children}</div>;
+  }
+
   const variants: Variants = {
-    hidden: { opacity: 0, y: reduce ? 0 : y },
+    hidden: { opacity: 0, y },
     show: {
       opacity: 1,
       y: 0,
