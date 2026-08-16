@@ -33,8 +33,12 @@ export function ContactForm() {
   async function onSubmit(e: React.FormEvent<HTMLFormElement>) {
     e.preventDefault();
     if (parseInt(captchaInput, 10) !== captcha.answer) {
+      // FIX : ne pas appeler refreshCaptcha() ici — elle remet captchaError à false
+      // et React batchant les setState, le message d'erreur n'apparaissait jamais.
+      // On régénère manuellement la question sans toucher à captchaError.
       setCaptchaError(true);
-      refreshCaptcha();
+      setCaptcha(generateCaptcha());
+      setCaptchaInput("");
       return;
     }
     setStatus("loading");
