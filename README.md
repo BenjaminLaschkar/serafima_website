@@ -448,18 +448,32 @@ chown -R deploy:deploy /home/deploy/.ssh
 
 ### C. Certificats Let’s Encrypt
 
+> ⚠️ Utiliser la méthode **webroot**, pas `--standalone`. Nginx (dans Docker) occupe
+> en permanence le port 80, donc `--standalone` ne peut pas se relancer seul lors du
+> renouvellement automatique (le timer échoue silencieusement → certificat expiré).
+> Le fichier `nginx/serafima.conf` sert déjà `/.well-known/acme-challenge/` depuis
+> `/var/www/certbot`, et ce dossier est monté dans le conteneur Nginx.
+
 ```bash
 # Sur Ubuntu 24.04 — snap est la méthode recommandée par Canonical
 snap install --classic certbot
 ln -s /snap/bin/certbot /usr/bin/certbot
 
-systemctl stop nginx 2>/dev/null || true
-certbot certonly --standalone \
+mkdir -p /var/www/certbot
+
+# Démarrer d'abord la stack (Nginx doit tourner et servir le webroot)
+cd /home/deploy/serafima
+docker compose up -d
+
+certbot certonly --webroot -w /var/www/certbot \
   -d serafima-liberman.com -d www.serafima-liberman.com \
   -m serafimaliberman@gmail.com --agree-tos --no-eff-email
 
+docker compose restart nginx
+
 # Renouvellement auto (snap le gère nativement via systemd timer — rien à faire)
 # Vérification : systemctl status snap.certbot.renew.timer
+# Test à sec : certbot renew --dry-run
 ```
 
 ### D. Déploiement applicatif
